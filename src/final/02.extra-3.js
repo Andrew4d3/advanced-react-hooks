@@ -2,6 +2,9 @@
 // 💯 make safeDispatch with useCallback, useRef, and useEffect
 // http://localhost:3000/isolated/final/02.extra-3.js
 
+// NOTE to myself: The issue this excersie resolves does not longer happen in React 18
+// Still is important to understand how to resolve it for previous react versions
+
 import * as React from 'react'
 import {
   fetchPokemon,
@@ -11,7 +14,9 @@ import {
   PokemonErrorBoundary,
 } from '../pokemon'
 
+// Here we receive the unsafe dispatch function as parameter
 function useSafeDispatch(dispatch) {
+  // We create a ref to keep track if the component is mounted or not
   const mountedRef = React.useRef(false)
 
   // to make this even more generic you should use the useLayoutEffect hook to
@@ -20,13 +25,18 @@ function useSafeDispatch(dispatch) {
   // with the dom another side effect inside a useLayoutEffect which does
   // interact with the dom may depend on the value being set
   React.useEffect(() => {
+    // When our component is mounted we set the ref to true
     mountedRef.current = true
     return () => {
+      // When it's unmounted we set it to false
       mountedRef.current = false
     }
+    // By having our dep array empty we make it run only once (when first rendered)
   }, [])
 
+  // We return the new function,
   return React.useCallback(
+    // If our component is mounted we return the dispatch function, otherwise, we return an empty function that does nothing (void 0)
     (...args) => (mountedRef.current ? dispatch(...args) : void 0),
     [dispatch],
   )
