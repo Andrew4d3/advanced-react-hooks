@@ -17,16 +17,28 @@ const CountProviver = props => {
   return <CountContext.Provider value={value} {...props} />
 }
 
+const useCountProvider = () => {
+  const value = React.useContext(CountContext)
+
+  if (!value) {
+    throw new Error(
+      'useCountProvider should be called from inside a CountProvider child',
+    )
+  }
+
+  return value
+}
+
 function CountDisplay() {
   // 🐨 get the count from useContext with the CountContext
-  const [count] = React.useContext(CountContext)
+  const [count] = useCountProvider()
 
   return <div>{`The current count is ${count}`}</div>
 }
 
 function Counter() {
   // 🐨 get the setCount from useContext with the CountContext
-  const [, setCount] = React.useContext(CountContext)
+  const [, setCount] = useCountProvider()
 
   const increment = () => setCount(c => c + 1)
   return <button onClick={increment}>Increment count</button>
